@@ -8,6 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    </script>
 </head>
 <body class="login-body">
 
@@ -16,6 +20,12 @@
 
     <!-- ── Login Card ────────────────────────────────────── -->
     <div class="login-container">
+        <div style="text-align: right; margin-bottom: 1rem;">
+            <button id="themeToggle" class="btn btn-outline" style="border-radius: 50%; padding: 0.5rem; background: var(--bg-card); cursor: pointer;" title="Toggle Theme">
+                <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none; width: 18px; height: 18px;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="4.22" x2="19.78" y2="5.64"></line></svg>
+                <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+        </div>
         <div class="login-card">
             <!-- Branding -->
             <div class="login-brand">
@@ -117,6 +127,31 @@
                 container.appendChild(p);
             }
         })();
+
+        // ── Theme Toggle Logic ─────────────────────────────────
+        const themeBtn = document.getElementById('themeToggle');
+        const sunIcon = themeBtn.querySelector('.sun-icon');
+        const moonIcon = themeBtn.querySelector('.moon-icon');
+
+        function updateIcons() {
+            if (document.documentElement.getAttribute('data-theme') === 'light') {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+        }
+        
+        updateIcons(); // Initial load
+
+        themeBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcons();
+        });
     </script>
 </body>
 </html>

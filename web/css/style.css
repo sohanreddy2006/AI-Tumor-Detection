@@ -44,6 +44,29 @@
     --font:             'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+[data-theme="light"] {
+    --bg-primary:       #f8fafc;
+    --bg-secondary:     #ffffff;
+    --bg-card:          #ffffff;
+    --bg-card-hover:    #f1f5f9;
+    --surface:          #f8fafc;
+
+    --accent-cyan:      #2563eb;
+    --accent-purple:    #4f46e5;
+    --accent-blue:      #3b82f6;
+    --accent-teal:      #0d9488;
+
+    --text-primary:     #0f172a;
+    --text-secondary:   #475569;
+    --text-muted:       #64748b;
+
+    --border-color:     #e2e8f0;
+    --glow-cyan:        none;
+    --glow-purple:      none;
+    --shadow-card:      0 2px 10px rgba(0, 0, 0, 0.05);
+    --shadow-elevated:  0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
 /* ── Reset & Base ──────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -56,6 +79,7 @@ body {
     line-height: 1.6;
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 a { color: var(--accent-cyan); text-decoration: none; }

@@ -13,7 +13,7 @@ public class DBConnection {
     // ── Configuration ─────────────────────────────────────────
     private static final String DB_URL  = "jdbc:mysql://localhost:3306/tumor_detection_db";
     private static final String DB_USER = "root";
-    private static final String DB_PASS = "root";   // Change as per your MySQL setup
+    private static final String DB_PASS = "root123";   // Updated for user's MySQL setup
     private static final String DRIVER  = "com.mysql.cj.jdbc.Driver";
 
     // ── Get Connection ────────────────────────────────────────

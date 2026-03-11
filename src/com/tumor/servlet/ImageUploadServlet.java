@@ -6,11 +6,18 @@ import javax.servlet.http.*;
 import java.io.*;
 import java.sql.*;
 
+import javax.servlet.annotation.MultipartConfig;
+
 /**
- * Handles medical image metadata uploads.
+ * Handles medical image metadata and file uploads.
  * GET  /upload — returns images as JSON.
- * POST /upload — stores image metadata linked to a patient.
+ * POST /upload — stores image metadata and physical file on server.
  */
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,      // 1MB
+    maxFileSize       = 1024 * 1024 * 50, // 50MB
+    maxRequestSize    = 1024 * 1024 * 100 // 100MB
+)
 public class ImageUploadServlet extends HttpServlet {
 
     @Override
@@ -84,18 +91,25 @@ public class ImageUploadServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         String patientIdStr = request.getParameter("patientId");
-        String fileName     = request.getParameter("fileName");
-        String fileType     = request.getParameter("fileType");
-        String fileSize     = request.getParameter("fileSize");
-        String scanType     = request.getParameter("scanType");
-
-        // ── Validation ────────────────────────────────────────
-        if (patientIdStr == null || fileName == null || fileName.trim().isEmpty() ||
-            fileType == null || fileType.trim().isEmpty()) {
+        Part filePart = request.getPart("imageFile");
+        if (patientIdStr == null || filePart == null || filePart.getSize() == 0) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"error\":\"Patient ID, file name, and file type are required.\"}");
+            response.getWriter().write("{\"error\":\"Patient ID and a valid file are required.\"}");
             return;
         }
+
+        String originalFileName = getFileName(filePart);
+        String fileType         = getFileExtension(originalFileName).toUpperCase();
+        String fileSize         = formatFileSize(filePart.getSize());
+        String scanType         = request.getParameter("scanType");
+
+        // ── Save File to Disk ───────────────────────────────────
+        String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
+        File uploadDir = new File(uploadPath);
+        if (!uploadDir.exists()) uploadDir.mkdir();
+
+        String savedFileName = System.currentTimeMillis() + "_" + originalFileName;
+        filePart.write(uploadPath + File.separator + savedFileName);
 
         int patientId;
         try {
@@ -113,9 +127,9 @@ public class ImageUploadServlet extends HttpServlet {
             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             try {
                 ps.setInt(1, patientId);
-                ps.setString(2, fileName.trim());
-                ps.setString(3, fileType.trim());
-                ps.setString(4, fileSize != null ? fileSize.trim() : "Unknown");
+                ps.setString(2, savedFileName); // Save the actual saved filename
+                ps.setString(3, fileType);
+                ps.setString(4, fileSize);
                 ps.setString(5, scanType != null ? scanType.trim() : "MRI");
                 ps.executeUpdate();
 
@@ -157,6 +171,29 @@ public class ImageUploadServlet extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getFileName(Part part) {
+        String contentDisp = part.getHeader("content-disposition");
+        for (String content : contentDisp.split(";")) {
+            if (content.trim().startsWith("filename")) {
+                return content.substring(content.indexOf("=") + 2, content.length() - 1);
+            }
+        }
+        return "unknown.bin";
+    }
+
+    private String getFileExtension(String fileName) {
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) return fileName.substring(i + 1);
+        return "BIN";
+    }
+
+    private String formatFileSize(long size) {
+        if (size <= 0) return "0 B";
+        final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
+        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+        return new java.text.DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 
     private String escapeJson(String s) {

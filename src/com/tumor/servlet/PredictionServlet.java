@@ -17,6 +17,25 @@ public class PredictionServlet extends HttpServlet {
     private static final Random random = new Random();
 
     @Override
+    public void init() throws ServletException {
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            Statement stmt = conn.createStatement();
+            
+            // Auto-patch for existing databases
+            try { stmt.execute("ALTER TABLE PREDICTION_RESULT ADD COLUMN tumor_type VARCHAR(50)"); } catch (Exception e) {}
+            try { stmt.execute("ALTER TABLE PREDICTION_RESULT ADD COLUMN recommendation TEXT"); } catch (Exception e) {}
+            
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnection.closeConnection(conn);
+        }
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -54,22 +73,30 @@ public class PredictionServlet extends HttpServlet {
         double score = Math.round(random.nextDouble() * 10000.0) / 100.0; // 0.00 – 100.00
         String severity;
         String notes;
+        String tumorType;
+        String recommendation;
 
         if (score <= 30) {
             severity = "No Tumor";
+            tumorType = "Normal";
             notes = "Scan analysis indicates no significant abnormalities detected.";
+            recommendation = "Maintain routine screening. Next follow-up scan in 12 months.";
         } else if (score <= 60) {
             severity = "Possible Tumor";
+            tumorType = random.nextBoolean() ? "Benign Mass" : "Meningioma (Low Grade)";
             notes = "Suspicious region identified — further diagnostic evaluation recommended.";
+            recommendation = "Schedule Contrast-Enhanced MRI and follow-up with a neurologist within 30 days.";
         } else {
             severity = "High Risk Tumor";
+            tumorType = random.nextBoolean() ? "Glioma" : "Pituitary Tumor";
             notes = "High-confidence anomaly detected — immediate specialist consultation advised.";
+            recommendation = "Urgent: Immediate neurosurgical consultation and biopsy required for definitive diagnosis.";
         }
 
         Connection conn = null;
         try {
             conn = DBConnection.getConnection();
-            String sql = "INSERT INTO PREDICTION_RESULT (image_id, patient_id, score, severity, notes) VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO PREDICTION_RESULT (image_id, patient_id, score, severity, notes, tumor_type, recommendation) VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             try {
                 ps.setInt(1, imageId);
@@ -77,6 +104,8 @@ public class PredictionServlet extends HttpServlet {
                 ps.setDouble(3, score);
                 ps.setString(4, severity);
                 ps.setString(5, notes);
+                ps.setString(6, tumorType);
+                ps.setString(7, recommendation);
                 ps.executeUpdate();
 
                 ResultSet keys = ps.getGeneratedKeys();
@@ -97,6 +126,8 @@ public class PredictionServlet extends HttpServlet {
                 json.append("\"predictionId\":").append(predictionId).append(",");
                 json.append("\"score\":").append(score).append(",");
                 json.append("\"severity\":\"").append(severity).append("\",");
+                json.append("\"tumorType\":\"").append(escapeJson(tumorType)).append("\",");
+                json.append("\"recommendation\":\"").append(escapeJson(recommendation)).append("\",");
                 json.append("\"notes\":\"").append(escapeJson(notes)).append("\"");
                 json.append("}");
 
@@ -153,6 +184,8 @@ public class PredictionServlet extends HttpServlet {
                     json.append("\"fileName\":\"").append(escapeJson(rs.getString("file_name"))).append("\",");
                     json.append("\"score\":").append(rs.getDouble("score")).append(",");
                     json.append("\"severity\":\"").append(escapeJson(rs.getString("severity"))).append("\",");
+                    json.append("\"tumorType\":\"").append(escapeJson(rs.getString("tumor_type"))).append("\",");
+                    json.append("\"recommendation\":\"").append(escapeJson(rs.getString("recommendation"))).append("\",");
                     json.append("\"notes\":\"").append(escapeJson(rs.getString("notes"))).append("\",");
                     json.append("\"createdAt\":\"").append(rs.getTimestamp("created_at")).append("\"");
                     json.append("}");
