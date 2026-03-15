@@ -84,6 +84,18 @@
         <url-pattern>/logs</url-pattern>
     </servlet-mapping>
 
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- Booking Servlet                                       -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <servlet>
+        <servlet-name>BookingServlet</servlet-name>
+        <servlet-class>com.tumor.servlet.BookingServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BookingServlet</servlet-name>
+        <url-pattern>/booking</url-pattern>
+    </servlet-mapping>
+
     <!-- Session Timeout (30 minutes) -->
     <session-config>
         <session-timeout>30</session-timeout>

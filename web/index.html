@@ -1,157 +1,727 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AI-Based Tumor Detection Simulation System — Secure login portal for medical professionals.">
-    <title>Login — AI Tumor Detection System</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <script>
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        if (savedTheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
-    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI-Based Tumor Detection Simulation System — Secure login portal for medical professionals.">
+<title>Login — AI Tumor Detection System</title>
+
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script>
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  if (savedTheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+</script>
+
+<style>
+/* ── CSS Variables ─────────────────────────────────── */
+:root {
+  --bg: #0f0f1a;
+  --bg-card: #1a1a2e;
+  --bg-input: #252540;
+  --text: #e0e0f0;
+  --text-muted: #8888aa;
+  --border: #2e2e50;
+  --accent: #00d4ff;
+  --accent2: #7c3aed;
+  --btn-bg: linear-gradient(135deg, #00d4ff, #7c3aed);
+  --toggle-bg: linear-gradient(135deg, #7c3aed, #00d4ff);
+  --error-bg: rgba(255, 80, 80, 0.15);
+  --error-color: #ff6b6b;
+  --shadow: 0 0 40px rgba(0, 212, 255, 0.12);
+}
+
+[data-theme="light"] {
+  --bg: #dde4f5;
+  --bg-card: #ffffff;
+  --bg-input: #eeeeee;
+  --text: #1a1a2e;
+  --text-muted: #555577;
+  --border: #ccccdd;
+  --accent: #5a6ff0;
+  --accent2: #7c3aed;
+  --btn-bg: linear-gradient(135deg, #5a6ff0, #7c3aed);
+  --toggle-bg: linear-gradient(135deg, #7494ec, #5a6ff0);
+  --error-bg: rgba(200, 40, 40, 0.1);
+  --error-color: #cc2222;
+  --shadow: 0 0 40px rgba(116, 148, 236, 0.3);
+}
+
+*, *::before, *::after {
+  margin: 0; padding: 0;
+  box-sizing: border-box;
+  font-family: Poppins, sans-serif;
+}
+
+html, body { width: 100%; height: 100%; }
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  position: relative;
+  z-index: 0;
+  transition: background 0.4s, color 0.4s;
+}
+
+/* ── Particles ─────────────────────────────────────── */
+.particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.15;
+  animation: floatParticle linear infinite;
+}
+
+@keyframes floatParticle {
+  0%   { transform: translateY(0) scale(1); opacity: 0.15; }
+  50%  { opacity: 0.35; }
+  100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
+}
+
+/* ── Theme Toggle ──────────────────────────────────── */
+.theme-toggle-wrap {
+  position: fixed;
+  top: 1.2rem;
+  right: 1.5rem;
+  z-index: 100;
+}
+
+.theme-btn {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.theme-btn:hover { border-color: var(--accent); }
+.theme-btn svg { width: 18px; height: 18px; }
+
+/* ── Main Container ────────────────────────────────── */
+.container {
+  position: relative;
+  width: 850px;
+  height: 580px;
+  background: var(--bg-card);
+  border-radius: 30px;
+  box-shadow: var(--shadow), 0 0 0 1px var(--border);
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 1;
+  transition: background 0.4s, box-shadow 0.4s;
+}
+
+/* ── Form Boxes ────────────────────────────────────── */
+.form-box {
+  position: absolute;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  text-align: center;
+  padding: 32px 38px;
+  transition: .6s ease-in-out;
+  z-index: 1;
+  overflow-y: auto;
+}
+
+.container.active .form-box { right: 50%; }
+.form-box.register { visibility: hidden; }
+.container.active .form-box.register { visibility: visible; }
+.form-box form { width: 100%; }
+
+/* ── Branding ──────────────────────────────────────── */
+.login-brand { margin-bottom: 14px; }
+
+.brand-icon {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 6px;
+}
+
+.brand-icon svg { width: 100%; height: 100%; }
+
+.login-brand h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.brand-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Error Message ─────────────────────────────────── */
+.error-message {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: var(--error-bg);
+  color: var(--error-color);
+  border: 1px solid var(--error-color);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+/* ── Inputs ────────────────────────────────────────── */
+.input-box { position: relative; margin: 12px 0; }
+
+.input-box input {
+  width: 100%;
+  padding: 11px 44px 11px 14px;
+  background: var(--bg-input);
+  color: var(--text);
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  outline: none;
+  font-size: 13.5px;
+  transition: border-color 0.25s;
+}
+
+.input-box input:focus { border-color: var(--accent); }
+.input-box input::placeholder { color: var(--text-muted); }
+
+.input-box i {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 17px;
+}
+
+/* ── Submit Buttons ────────────────────────────────── */
+.btn-submit {
+  width: 100%;
+  height: 44px;
+  background: var(--btn-bg);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+}
+
+.btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.spinner {
+  width: 15px; height: 15px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Social Icons ──────────────────────────────────── */
+.social-icons { margin-top: 12px; }
+
+.social-icons a {
+  display: inline-flex;
+  padding: 7px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  margin: 3px;
+  font-size: 19px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.social-icons a:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Demo Credentials ──────────────────────────────── */
+.demo-credentials {
+  margin-top: 12px;
+  padding: 9px 12px;
+  background: var(--bg-input);
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.demo-credentials p { line-height: 1.75; }
+
+.demo-credentials code {
+  background: var(--border);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--accent);
+}
+
+/* ── Toggle Sliding Panel ──────────────────────────── */
+.toggle-box {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.toggle-box::before {
+  content: '';
+  position: absolute;
+  left: -250%;
+  width: 300%;
+  height: 100%;
+  background: var(--toggle-bg);
+  border-radius: 150px;
+  transition: 1.5s;
+  z-index: 2;
+}
+
+.container.active .toggle-box::before { left: 50%; }
+
+.toggle-panel {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  z-index: 3;
+  pointer-events: all;
+  padding: 40px 28px;
+  text-align: center;
+}
+
+.toggle-left  { left: 0; }
+.toggle-right { right: -50%; transition: .6s ease-in-out; }
+.container.active .toggle-right { right: 0; }
+.container.active .toggle-left  { left: -50%; transition: .6s ease-in-out; }
+
+.toggle-panel h1 { font-size: 24px; margin-bottom: 10px; }
+.toggle-panel p  { margin-bottom: 16px; font-size: 13.5px; opacity: 0.9; }
+
+.btn-toggle {
+  width: 150px;
+  height: 42px;
+  background: transparent;
+  border: 2px solid white;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-toggle:hover { background: rgba(255,255,255,0.15); }
+
+/* ── Role Selection Cards ────────────────────────── */
+.role-selection {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+  justify-content: center;
+}
+
+.role-card {
+  flex: 1;
+  background: var(--bg-input);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.role-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.role-card.selected {
+  border-color: var(--accent);
+  background: rgba(0, 212, 255, 0.05);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+}
+
+[data-theme="light"] .role-card.selected {
+  background: rgba(90, 111, 240, 0.05);
+  border-color: var(--accent);
+  box-shadow: 0 0 15px rgba(90, 111, 240, 0.2);
+}
+
+.role-card i {
+  font-size: 24px;
+  color: var(--text-muted);
+  transition: color 0.3s;
+}
+
+.role-card.selected i {
+  color: var(--accent);
+}
+
+.role-card span {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.role-card.selected span {
+  color: var(--text);
+}
+
+.role-card .check-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--accent);
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.role-card.selected .check-badge {
+  opacity: 1;
+  transform: scale(1);
+}
+</style>
 </head>
-<body class="login-body">
 
-    <!-- ── Animated Background Particles ─────────────────── -->
-    <div class="particles" id="particles"></div>
+<body>
 
-    <!-- ── Login Card ────────────────────────────────────── -->
-    <div class="login-container">
-        <div style="text-align: right; margin-bottom: 1rem;">
-            <button id="themeToggle" class="btn btn-outline" style="border-radius: 50%; padding: 0.5rem; background: var(--bg-card); cursor: pointer;" title="Toggle Theme">
-                <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none; width: 18px; height: 18px;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="4.22" x2="19.78" y2="5.64"></line></svg>
-                <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            </button>
+<!-- ── Animated Particles ─────────────────────────── -->
+<div class="particles" id="particles"></div>
+
+<!-- ── Theme Toggle Button ───────────────────────── -->
+<div class="theme-toggle-wrap">
+  <button id="themeToggle" class="theme-btn" title="Toggle Theme">
+    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" style="display:none">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="4.22" x2="19.78" y2="5.64"/>
+    </svg>
+    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- ── Main Sliding Container ────────────────────── -->
+<div class="container" id="mainContainer">
+
+  <!-- ── Login Form ─────────────────────────────── -->
+  <div class="form-box login">
+    <form action="login" method="POST" id="loginForm" autocomplete="off">
+
+      <div class="login-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="22" stroke="url(#grad1)" stroke-width="3"/>
+            <path d="M24 10v28M10 24h28" stroke="url(#grad1)" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="24" cy="24" r="8" stroke="url(#grad1)" stroke-width="2" opacity="0.6"/>
+            <defs>
+              <linearGradient id="grad1" x1="0" y1="0" x2="48" y2="48">
+                <stop offset="0%" stop-color="#00d4ff"/>
+                <stop offset="100%" stop-color="#7c3aed"/>
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
-        <div class="login-card">
-            <!-- Branding -->
-            <div class="login-brand">
-                <div class="brand-icon">
-                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="24" cy="24" r="22" stroke="url(#grad1)" stroke-width="3"/>
-                        <path d="M24 10v28M10 24h28" stroke="url(#grad1)" stroke-width="3" stroke-linecap="round"/>
-                        <circle cx="24" cy="24" r="8" stroke="url(#grad1)" stroke-width="2" opacity="0.6"/>
-                        <defs>
-                            <linearGradient id="grad1" x1="0" y1="0" x2="48" y2="48">
-                                <stop offset="0%" stop-color="#00d4ff"/>
-                                <stop offset="100%" stop-color="#7c3aed"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                </div>
-                <h1>AI Tumor Detection</h1>
-                <p class="brand-subtitle">Simulation System</p>
-            </div>
+        <h1>AI Tumor Detection</h1>
+        <p class="brand-subtitle">Simulation System</p>
+      </div>
 
-            <!-- Error Message -->
-            <div class="error-message" id="errorMsg" style="display:none;">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                </svg>
-                <span id="errorText">Invalid credentials. Please try again.</span>
-            </div>
+      <div class="error-message" id="loginErrorMsg">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <span id="loginErrorText">Invalid credentials. Please try again.</span>
+      </div>
 
-            <!-- Login Form -->
-            <form action="login" method="POST" id="loginForm" autocomplete="off">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <div class="input-wrapper">
-                        <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-                        </svg>
-                        <input type="text" id="username" name="username" placeholder="Enter your username" required>
-                    </div>
-                </div>
+      <div class="input-box">
+        <input type="text" id="username" name="username" placeholder="Username" required>
+        <i class='bx bxs-user'></i>
+      </div>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-wrapper">
-                        <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                        </svg>
-                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                    </div>
-                </div>
+      <div class="input-box">
+        <input type="password" id="password" name="password" placeholder="Password" required>
+        <i class='bx bxs-lock-alt'></i>
+      </div>
 
-                <button type="submit" class="btn-login" id="loginBtn">
-                    <span class="btn-text">Sign In</span>
-                    <span class="btn-loader" style="display:none;">
-                        <span class="spinner"></span> Authenticating...
-                    </span>
-                </button>
-            </form>
+      <button type="submit" class="btn-submit" id="loginSubmitBtn">
+        <span class="btn-text">Sign In</span>
+        <span class="btn-loader" style="display:none;"><span class="spinner"></span> Authenticating...</span>
+      </button>
 
-            <!-- Demo Credentials -->
-            <div class="demo-credentials">
-                <p><strong>Demo Credentials</strong></p>
-                <p><code>admin / admin123</code> &nbsp;or&nbsp; <code>drsmith / smith2024</code></p>
-            </div>
+      <div class="social-icons">
+        <a href="#"><i class='bx bxl-google'></i></a>
+        <a href="#"><i class='bx bxl-facebook'></i></a>
+        <a href="#"><i class='bx bxl-github'></i></a>
+      </div>
+
+      <div class="demo-credentials">
+        <p><strong>Demo Credentials</strong></p>
+        <p><code>admin / admin123</code> &nbsp;or&nbsp; <code>drsmith / smith2024</code></p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ── Register Form ──────────────────────────── -->
+  <div class="form-box register">
+    <form id="registerForm" action="signup" method="POST" autocomplete="off">
+
+      <div class="login-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="22" stroke="url(#grad2)" stroke-width="3"/>
+            <path d="M24 10v28M10 24h28" stroke="url(#grad2)" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="24" cy="24" r="8" stroke="url(#grad2)" stroke-width="2" opacity="0.6"/>
+            <defs>
+              <linearGradient id="grad2" x1="0" y1="0" x2="48" y2="48">
+                <stop offset="0%" stop-color="#00d4ff"/>
+                <stop offset="100%" stop-color="#7c3aed"/>
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
+        <h1>Create Account</h1>
+        <p class="brand-subtitle">Join the System</p>
+      </div>
 
-        <p class="login-footer">&copy; 2026 AI Tumor Detection Simulation System &bull; Academic Project</p>
+      <div class="error-message" id="registerErrorMsg">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <span id="registerErrorText">Please fill in all fields.</span>
+      </div>
+
+      <div class="input-box">
+        <input type="text" name="fullName" placeholder="Full Name" required>
+        <i class='bx bxs-user-detail'></i>
+      </div>
+
+      <!-- Role Selection -->
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px; text-align: left;">I am a...</p>
+      <div class="role-selection">
+        <div class="role-card selected" data-role="doctor">
+          <i class='bx bxs-medal'></i>
+          <span>Doctor</span>
+          <div class="check-badge"><i class='bx bx-check'></i></div>
+        </div>
+        <div class="role-card" data-role="patient">
+          <i class='bx bxs-user-circle'></i>
+          <span>Patient</span>
+          <div class="check-badge"><i class='bx bx-check'></i></div>
+        </div>
+      </div>
+      <input type="hidden" name="role" id="selectedRole" value="doctor">
+
+      <div class="input-box">
+        <input type="text" name="username" placeholder="Username" required>
+        <i class='bx bxs-user'></i>
+      </div>
+
+      <div class="input-box">
+        <input type="password" name="password" placeholder="Password" required>
+        <i class='bx bxs-lock-alt'></i>
+      </div>
+
+      <button type="submit" class="btn-submit" id="registerSubmitBtn">
+        <span class="btn-text">Register</span>
+        <span class="btn-loader" style="display:none;"><span class="spinner"></span> Creating account...</span>
+      </button>
+
+    </form>
+  </div>
+
+  <!-- ── Sliding Toggle Panel ───────────────────── -->
+  <div class="toggle-box">
+    <div class="toggle-panel toggle-left">
+      <h1>Hello Friend!</h1>
+      <p>Don't have an account?</p>
+      <button class="btn-toggle register-btn">Register</button>
     </div>
 
-    <script>
-        // ── Show error from URL params ──────────────────────
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('error')) {
-            const msg = document.getElementById('errorMsg');
-            const txt = document.getElementById('errorText');
-            msg.style.display = 'flex';
-            if (params.get('error') === 'empty') txt.textContent = 'Please enter both username and password.';
-            else if (params.get('error') === 'invalid') txt.textContent = 'Invalid username or password. Please try again.';
-            else txt.textContent = 'A server error occurred. Please try later.';
-        }
+    <div class="toggle-panel toggle-right">
+      <h1>Welcome Back!</h1>
+      <p>Already have an account?</p>
+      <button class="btn-toggle login-btn">Login</button>
+    </div>
+  </div>
 
-        // ── Loading state ───────────────────────────────────
-        document.getElementById('loginForm').addEventListener('submit', function() {
-            document.querySelector('.btn-text').style.display = 'none';
-            document.querySelector('.btn-loader').style.display = 'inline-flex';
-            document.getElementById('loginBtn').disabled = true;
-        });
+</div>
 
-        // ── Particle animation ──────────────────────────────
-        (function() {
-            const container = document.getElementById('particles');
-            for (let i = 0; i < 40; i++) {
-                const p = document.createElement('span');
-                p.className = 'particle';
-                p.style.left = Math.random() * 100 + '%';
-                p.style.top  = Math.random() * 100 + '%';
-                p.style.animationDelay = (Math.random() * 8) + 's';
-                p.style.animationDuration = (6 + Math.random() * 10) + 's';
-                p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
-                container.appendChild(p);
-            }
-        })();
+<p class="login-footer">&copy; 2026 AI Tumor Detection Simulation System &bull; Academic Project</p>
 
-        // ── Theme Toggle Logic ─────────────────────────────────
-        const themeBtn = document.getElementById('themeToggle');
-        const sunIcon = themeBtn.querySelector('.sun-icon');
-        const moonIcon = themeBtn.querySelector('.moon-icon');
+<script>
+  // ── Panel toggle ────────────────────────────────────
+  const container   = document.getElementById('mainContainer');
+  const registerBtn = document.querySelector('.register-btn');
+  const loginBtn    = document.querySelector('.login-btn');
 
-        function updateIcons() {
-            if (document.documentElement.getAttribute('data-theme') === 'light') {
-                sunIcon.style.display = 'none';
-                moonIcon.style.display = 'block';
-            } else {
-                sunIcon.style.display = 'block';
-                moonIcon.style.display = 'none';
-            }
-        }
-        
-        updateIcons(); // Initial load
+  registerBtn.addEventListener('click', () => container.classList.add('active'));
+  loginBtn.addEventListener('click',    () => container.classList.remove('active'));
 
-        themeBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateIcons();
-        });
-    </script>
+  // ── URL error/success params ───────────────────────
+  const params = new URLSearchParams(window.location.search);
+  
+  // Login Error Handling
+  if (params.get('error')) {
+    const msg = document.getElementById('loginErrorMsg');
+    const txt = document.getElementById('loginErrorText');
+    const regMsg = document.getElementById('registerErrorMsg');
+    const regTxt = document.getElementById('registerErrorText');
+    
+    const err = params.get('error');
+    
+    if (err === 'empty' || err === 'exists') {
+      // Registration error context
+      container.classList.add('active'); // Switch to register panel
+      regMsg.style.display = 'flex';
+      if (err === 'empty') regTxt.textContent = 'Please fill in all registration fields.';
+      else if (err === 'exists') regTxt.textContent = 'Username already exists. Try another.';
+    } else {
+      // Login error context
+      msg.style.display = 'flex';
+      if (err === 'empty') txt.textContent = 'Please enter both username and password.';
+      else if (err === 'invalid') txt.textContent = 'Invalid username or password.';
+      else txt.textContent = 'A server error occurred.';
+    }
+  }
+
+  // Registration Success Handling
+  if (params.get('success') === 'registered') {
+    const msg = document.getElementById('loginErrorMsg');
+    const txt = document.getElementById('loginErrorText');
+    msg.style.display = 'flex';
+    msg.style.background = 'rgba(40, 200, 40, 0.1)';
+    msg.style.borderColor = '#28c828';
+    msg.style.color = '#28c828';
+    txt.textContent = 'Account created! Please log in above.';
+  }
+
+  // ── Login loading state ─────────────────────────────
+  document.getElementById('loginForm').addEventListener('submit', function() {
+    const btn = document.getElementById('loginSubmitBtn');
+    btn.querySelector('.btn-text').style.display   = 'none';
+    btn.querySelector('.btn-loader').style.display = 'inline-flex';
+    btn.disabled = true;
+  });
+
+  // ── Register loading state ─────────────────────────
+  document.getElementById('registerForm').addEventListener('submit', function() {
+    const btn = document.getElementById('registerSubmitBtn');
+    btn.querySelector('.btn-text').style.display   = 'none';
+    btn.querySelector('.btn-loader').style.display = 'inline-flex';
+    btn.disabled = true;
+  });
+
+  // ── Particles ───────────────────────────────────────
+  (function() {
+    const pc = document.getElementById('particles');
+    for (let i = 0; i < 45; i++) {
+      const p = document.createElement('span');
+      p.className = 'particle';
+      p.style.left              = Math.random() * 100 + '%';
+      p.style.top               = Math.random() * 100 + '%';
+      p.style.animationDelay    = (Math.random() * 8) + 's';
+      p.style.animationDuration = (6 + Math.random() * 10) + 's';
+      const sz = (2 + Math.random() * 4) + 'px';
+      p.style.width = p.style.height = sz;
+      pc.appendChild(p);
+    }
+  })();
+
+  // ── Theme toggle ────────────────────────────────────
+  const themeBtn = document.getElementById('themeToggle');
+  const sunIcon  = themeBtn.querySelector('.sun-icon');
+  const moonIcon = themeBtn.querySelector('.moon-icon');
+
+  function updateIcons() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    sunIcon.style.display  = isLight ? 'none'  : 'block';
+    moonIcon.style.display = isLight ? 'block' : 'none';
+  }
+
+  updateIcons();
+
+  themeBtn.addEventListener('click', () => {
+    const cur      = document.documentElement.getAttribute('data-theme');
+    const newTheme = cur === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateIcons();
+  });
+
+  // ── Role Selection Logic ────────────────────────────
+  const roleCards = document.querySelectorAll('.role-card');
+  const roleInput = document.getElementById('selectedRole');
+
+  roleCards.forEach(card => {
+    card.addEventListener('click', () => {
+      roleCards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      roleInput.value = card.getAttribute('data-role');
+    });
+  });
+</script>
 </body>
 </html>

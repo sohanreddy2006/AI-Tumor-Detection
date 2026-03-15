@@ -161,12 +161,24 @@ public class PredictionServlet extends HttpServlet {
 
         try {
             conn = DBConnection.getConnection();
+            String role = (String) session.getAttribute("role");
+            Integer userId = (Integer) session.getAttribute("userId");
+
             String sql = "SELECT pr.*, p.name AS patient_name, mi.file_name " +
                          "FROM PREDICTION_RESULT pr " +
                          "JOIN PATIENT p ON pr.patient_id = p.patient_id " +
-                         "JOIN MEDICAL_IMAGE mi ON pr.image_id = mi.image_id " +
-                         "ORDER BY pr.created_at DESC";
+                         "JOIN MEDICAL_IMAGE mi ON pr.image_id = mi.image_id ";
+
+            if ("patient".equalsIgnoreCase(role)) {
+                sql += "WHERE p.user_id = ? ";
+            }
+
+            sql += "ORDER BY pr.created_at DESC";
+            
             PreparedStatement ps = conn.prepareStatement(sql);
+            if ("patient".equalsIgnoreCase(role)) {
+                ps.setInt(1, userId);
+            }
             ResultSet rs = null;
             try {
                 rs = ps.executeQuery();

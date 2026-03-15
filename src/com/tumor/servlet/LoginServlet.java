@@ -53,7 +53,12 @@ public class LoginServlet extends HttpServlet {
                     // ── Log access ────────────────────────────────
                     logAccess(conn, rs.getInt("user_id"), "LOGIN", request.getRemoteAddr());
 
-                    response.sendRedirect("dashboard.jsp");
+                    String role = rs.getString("role");
+                    if ("patient".equalsIgnoreCase(role)) {
+                        response.sendRedirect("patient_dashboard.jsp");
+                    } else {
+                        response.sendRedirect("dashboard.jsp");
+                    }
                 } else {
                     response.sendRedirect("index.html?error=invalid");
                 }

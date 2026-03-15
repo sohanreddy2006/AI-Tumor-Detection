@@ -3,6 +3,7 @@ target/
 *.log
 .settings/
 .classpath
+uploads/
 .project
 .DS_Store
 *.war
